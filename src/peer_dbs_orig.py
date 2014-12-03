@@ -15,6 +15,7 @@ import common
 import time
 from _print_ import _print_
 from peer_ims import Peer_IMS
+import time
 
 # }}}
 
@@ -172,8 +173,10 @@ class Peer_DBS(Peer_IMS):
                         _print_(self.team_socket.getsockname(), \
                             Color.red, "<-", Color.none, chunk_number, "-", sender)
 
-                    if Peer_IMS.DIAGRAM:
-                        print(sender, " -> ", self.team_socket.getsockname()," : ",chunk_number)
+                    if Peer_IMS.DIAGRAM != "":
+                        ts = int(time.time())
+                        s = str(ts)+" = "+str(sender) + " -> " + str(self.team_socket.getsockname()) + " : " + str(chunk_number)+'\n'
+                        Peer_IMS.DIAGRAM_FILE.write(s)
 
                     # }}}
 
@@ -190,9 +193,10 @@ class Peer_DBS(Peer_IMS):
                                                                self.receive_and_feed_previous)[0]),\
                                 Color.green, "->", Color.none, peer)
 
-                        if Peer_IMS.DIAGRAM:
-                            print (self.team_socket.getsockname(), " -> ",peer, " : ",\
-                                                 socket.ntohs(struct.unpack(self.message_format, self.receive_and_feed_previous)[0]))
+                        if Peer_IMS.DIAGRAM != "":
+                            ts = int(time.time())
+                            s = str(ts)+" = "+ str(self.team_socket.getsockname())+ " -> "+str(peer)+ " : "+ str(socket.ntohs(struct.unpack(self.message_format, self.receive_and_feed_previous)[0]))+'\n'
+                            Peer_IMS.DIAGRAM_FILE.write(s)
                         # }}}
 
                         self.debt[peer] += 1
@@ -216,8 +220,10 @@ class Peer_DBS(Peer_IMS):
                         print (self.team_socket.getsockname(), \
                             Color.green, "<-", Color.none, chunk_number, "-", sender)
 
-                    if Peer_IMS.DIAGRAM:
-                        print(sender, " -> ", self.team_socket.getsockname()," : ",chunk_number)
+                    if Peer_IMS.DIAGRAM != "":
+                        ts = int(time.time())
+                        s = str(ts)+" = "+str(sender)+ " -> "+ str(self.team_socket.getsockname())+" : "+str(chunk_number)+'\n'
+                        Peer_IMS.DIAGRAM_FILE.write(s)
                     # }}}
 
                     if sender not in self.peer_list:
@@ -254,9 +260,11 @@ class Peer_DBS(Peer_IMS):
                             socket.ntohs(struct.unpack(self.message_format, self.receive_and_feed_previous)[0]),\
                             Color.green, "->", Color.none, peer)
 
-                    if Peer_IMS.DIAGRAM:
-                        print (self.team_socket.getsockname(), " -> ",peer, " : ",\
-                             socket.ntohs(struct.unpack(self.message_format, self.receive_and_feed_previous)[0]))
+                    if Peer_IMS.DIAGRAM != "":
+                        ts = int(time.time())
+                        s = str(ts)+" = "+str(self.team_socket.getsockname())+ " -> "+str(peer)+ " : "+\
+                             str(socket.ntohs(struct.unpack(self.message_format, self.receive_and_feed_previous)[0]))+'\n'
+                        Peer_IMS.DIAGRAM_FILE.write(s)
                     # }}}
 
                     self.receive_and_feed_counter += 1
@@ -322,6 +330,7 @@ class Peer_DBS(Peer_IMS):
         for peer in self.peer_list:
             self.say_goodbye(peer)
 
+        Peer_IMS.DIAGRAM_FILE.close()
         # }}}
 
     def buffer_data(self):

@@ -60,7 +60,7 @@ class Peer():
 
         parser.add_argument('--team_port', help='Port to communicate with the peers. Default {} (the SO will chose it).'.format(Peer_IMS.TEAM_PORT))
 
-        parser.add_argument("--diagram", action="store_true", help="It creates a data file that can be converted to diagram")
+        parser.add_argument("--diagram", help="It creates a data file that can be converted to diagram")
 
         args = parser.parse_known_args()[0]
 
@@ -81,7 +81,8 @@ class Peer():
             print ('PLAYER_PORT =', Peer_IMS.PLAYER_PORT)
 
         if args.diagram:
-            Peer_IMS.DIAGRAM = True
+            Peer_IMS.DIAGRAM = args.diagram
+            Peer_IMS.DIAGRAM_FILE = open(args.diagram, 'w')
 
         peer = Peer_IMS()
         peer.wait_for_the_player()

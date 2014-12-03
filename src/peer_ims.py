@@ -27,7 +27,8 @@ class Peer_IMS(threading.Thread):
     SPLITTER_HOST = "127.0.0.1" # Address of the splitter.
     SPLITTER_PORT = 4552        # Port of the splitter.
     TEAM_PORT = 0               # TCP port used to communicate the splitter.
-    DIAGRAM = False
+    DIAGRAM = ""
+    DIAGRAM_FILE = ""
     # }}}
 
     def __init__(self):
