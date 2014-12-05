@@ -378,9 +378,15 @@ class Peer_IMS(threading.Thread):
             for i in xrange(self.buffer_size):
                 if self.received[i]:
                     sys.stdout.write(str(i%10))
+                    if Peer_IMS.DIAGRAM != "":
+                        Peer_IMS.DIAGRAM_FILE.write(str(i%10))
                 else:
                     sys.stdout.write('.')
+                    if Peer_IMS.DIAGRAM != "":
+                        Peer_IMS.DIAGRAM_FILE.write('.')
             print ()
+            if Peer_IMS.DIAGRAM != "":
+                        Peer_IMS.DIAGRAM_FILE.write('\n')
             #print (self.team_socket.getsockname(),)
             sys.stdout.write(Color.none)
 
