@@ -176,7 +176,7 @@ class Peer_DBS(Peer_IMS):
                             Color.red, "<-", Color.none, chunk_number, "-", sender)
 
                     if Peer_IMS.DIAGRAM != "":
-                        self.ts = int(time.clock())
+                        self.ts = time.clock()
                         if self.pts != self.ts:
                             self.pts = self.ts
                             s = "note left of " + str(sender) + " : " + str(self.ts)+"\n"
@@ -200,7 +200,7 @@ class Peer_DBS(Peer_IMS):
                                 Color.green, "->", Color.none, peer)
 
                         if Peer_IMS.DIAGRAM != "":
-                            ts = int(time.clock())
+                            ts = time.clock()
                             s = str(ts)+" = "+ str(self.team_socket.getsockname())+ " -> "+str(peer)+ " : "+ str(socket.ntohs(struct.unpack(self.message_format, self.receive_and_feed_previous)[0]))+'\n'
                             Peer_IMS.DIAGRAM_FILE.write(s)
                         # }}}
@@ -227,7 +227,7 @@ class Peer_DBS(Peer_IMS):
                             Color.green, "<-", Color.none, chunk_number, "-", sender)
 
                     if Peer_IMS.DIAGRAM != "":
-                        ts = int(time.clock())
+                        ts = time.clock()
                         s = str(ts)+" = "+str(sender)+ " -> "+ str(self.team_socket.getsockname())+" : "+str(chunk_number)+'\n'
                         Peer_IMS.DIAGRAM_FILE.write(s)
                     # }}}
@@ -267,7 +267,7 @@ class Peer_DBS(Peer_IMS):
                             Color.green, "->", Color.none, peer)
 
                     if Peer_IMS.DIAGRAM != "":
-                        ts = int(time.clock())
+                        ts = time.clock()
                         s = str(ts)+" = "+str(self.team_socket.getsockname())+ " -> "+str(peer)+ " : "+\
                              str(socket.ntohs(struct.unpack(self.message_format, self.receive_and_feed_previous)[0]))+'\n'
                         Peer_IMS.DIAGRAM_FILE.write(s)
