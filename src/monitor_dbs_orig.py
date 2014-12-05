@@ -42,6 +42,9 @@ class Monitor_DBS(Peer_DBS):
         self.team_socket = peer.team_socket
         #self.extended_message_format = peer.extended_message_format
         
+
+	self.pts = 0
+        self.ts = 1
         # }}}
 
     def print_the_module_name(self):
