@@ -376,7 +376,8 @@ class Peer_IMS(threading.Thread):
 
         if __debug__:
             if Peer_IMS.DIAGRAM != "":
-                s= "note left of "+str(self.team_socket.getsockname())+" : "
+                ts = repr(time.time())
+                s= str(ts) + "\t note over "+str(self.team_socket.getsockname())+" : "
                 Peer_IMS.DIAGRAM_FILE.write(s)
             for i in xrange(self.buffer_size):
                 if self.received[i]:

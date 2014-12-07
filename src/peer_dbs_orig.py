@@ -13,6 +13,7 @@ import struct
 from color import Color
 import common
 import time
+from datetime import datetime
 from _print_ import _print_
 from peer_ims import Peer_IMS
 
@@ -175,14 +176,11 @@ class Peer_DBS(Peer_IMS):
                         _print_(self.team_socket.getsockname(), \
                             Color.red, "<-", Color.none, chunk_number, "-", sender)
 
-                    if Peer_IMS.DIAGRAM != "":
-                        self.ts = time.clock()
-                        if self.pts != self.ts:
-                            self.pts = self.ts
-                            s = "note left of " + str(sender) + " : " + str(self.ts)+"\n"
+                        if Peer_IMS.DIAGRAM != "":
+                            self.ts = datetime.now()
+                            ts= repr(time.time())
+                            s = str(ts) + "\t" + str(sender) + " -> " + str(self.team_socket.getsockname()) + " : " + str(chunk_number)+'\n'
                             Peer_IMS.DIAGRAM_FILE.write(s)
-                        s = str(sender) + " -> " + str(self.team_socket.getsockname()) + " : " + str(chunk_number)+'\n'
-                        Peer_IMS.DIAGRAM_FILE.write(s)
 
                     # }}}
 
@@ -199,10 +197,10 @@ class Peer_DBS(Peer_IMS):
                                                                self.receive_and_feed_previous)[0]),\
                                 Color.green, "->", Color.none, peer)
 
-                        if Peer_IMS.DIAGRAM != "":
-                            ts = time.clock()
-                            s = str(ts)+" = "+ str(self.team_socket.getsockname())+ " -> "+str(peer)+ " : "+ str(socket.ntohs(struct.unpack(self.message_format, self.receive_and_feed_previous)[0]))+'\n'
-                            Peer_IMS.DIAGRAM_FILE.write(s)
+                            if Peer_IMS.DIAGRAM != "":
+                                ts = repr(time.time())
+                                s = str(ts) + "\t" + str(self.team_socket.getsockname())+ " -> "+str(peer)+ " : "+ str(socket.ntohs(struct.unpack(self.message_format, self.receive_and_feed_previous)[0]))+'\n'
+                                Peer_IMS.DIAGRAM_FILE.write(s)
                         # }}}
 
                         self.debt[peer] += 1
@@ -226,10 +224,10 @@ class Peer_DBS(Peer_IMS):
                         print (self.team_socket.getsockname(), \
                             Color.green, "<-", Color.none, chunk_number, "-", sender)
 
-                    if Peer_IMS.DIAGRAM != "":
-                        ts = time.clock()
-                        s = str(ts)+" = "+str(sender)+ " -> "+ str(self.team_socket.getsockname())+" : "+str(chunk_number)+'\n'
-                        Peer_IMS.DIAGRAM_FILE.write(s)
+                        if Peer_IMS.DIAGRAM != "":
+                            ts = repr(time.time())
+                            s = str(ts) + "\t" +str(sender)+ " -> "+ str(self.team_socket.getsockname())+" : "+str(chunk_number)+'\n'
+                            Peer_IMS.DIAGRAM_FILE.write(s)
                     # }}}
 
                     if sender not in self.peer_list:
@@ -266,11 +264,11 @@ class Peer_DBS(Peer_IMS):
                             socket.ntohs(struct.unpack(self.message_format, self.receive_and_feed_previous)[0]),\
                             Color.green, "->", Color.none, peer)
 
-                    if Peer_IMS.DIAGRAM != "":
-                        ts = time.clock()
-                        s = str(ts)+" = "+str(self.team_socket.getsockname())+ " -> "+str(peer)+ " : "+\
-                             str(socket.ntohs(struct.unpack(self.message_format, self.receive_and_feed_previous)[0]))+'\n'
-                        Peer_IMS.DIAGRAM_FILE.write(s)
+                        if Peer_IMS.DIAGRAM != "":
+                            ts = repr(time.time())
+                            s = str(ts) + "\t" + str(self.team_socket.getsockname())+ " -> "+str(peer)+ " : "+\
+                                 str(socket.ntohs(struct.unpack(self.message_format, self.receive_and_feed_previous)[0]))+'\n'
+                            Peer_IMS.DIAGRAM_FILE.write(s)
                     # }}}
 
                     self.receive_and_feed_counter += 1

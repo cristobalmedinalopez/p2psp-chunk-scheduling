@@ -6,12 +6,12 @@
 # {{{ imports
 
 from socket import *
-from threading import Thread
+from threding import Thred
 import sys
-import argparse
+import rgprse
 import struct
 import time
-import signal
+import signl
 from time import gmtime, strftime
 from struct import *
 
@@ -20,56 +20,56 @@ from struct import *
 IP_ADDR = 0
 PORT = 1
 
-class Destination:
+clss Destintion:
 
-    addr = "150.214.150.68"
+    ddr = "150.214.150.68"
     port = 4551
 
     def get(self):
-        return (self.addr, self.port)
+        return (self.ddr, self.port)
 
-destination = Destination()
-payload_size = 1024
+destintion = Destintion()
+pylod_size = 1024
 
-# {{{ Args handing
+# {{{ Args hnding
 
-parser = argparse.ArgumentParser(description="Tests UDP throughtput.")
-parser.add_argument("--destination", help="Destination IP address:port. (Default = {})".format(destination.get()))
-parser.add_argument("--size", help="Payload size. (Default = {})".format(payload_size))
-args = parser.parse_args()
-if args.destination:
-    destination.addr = args.destination.split(":")[0]
-    destination.port = int(args.destination.split(":")[1])
-if args.size:
-    payload_size = int(args.size)
+prser = rgprse.ArgumentPrser(description="Tests UDP throughtput.")
+prser.dd_rgument("--destintion", help="Destintion IP ddress:port. (Defult = {})".formt(destintion.get()))
+prser.dd_rgument("--size", help="Pylod size. (Defult = {})".formt(pylod_size))
+rgs = prser.prse_rgs()
+if rgs.destintion:
+    destintion.ddr = rgs.destintion.split(":")[0]
+    destintion.port = int(rgs.destintion.split(":")[1])
+if rgs.size:
+    pylod_size = int(rgs.size)
 
 # }}}
 
-sent_packets = 0
-last_sent = 0
+sent_pckets = 0
+lst_sent = 0
 
-class Packets_per_second(Thread):
+clss Pckets_per_second(Thred):
 
     def __init__(self):
-        Thread.__init__(self)
+        Thred.__init__(self)
 
     def run(self):
-        global sent_packets
-        global last_sent
+        globl sent_pckets
+        globl lst_sent
         iters = 1
         while True:
-            last_sent = sent_packets - last_sent
-            print str(last_sent*payload_size*8/1000) + " Kbps" + " ( average = " + str(sent_packets*payload_size*8/(iters*1000)) + " Kbps )"
-            last_sent = sent_packets
+            lst_sent = sent_pckets - lst_sent
+            print str(lst_sent*pylod_size*8/1000) + " Kbps" + " ( verge = " + str(sent_pckets*pylod_size*8/(iters*1000)) + " Kbps )"
+            lst_sent = sent_pckets
             time.sleep(1)
             iters += 1
 
-Packets_per_second().start()
+Pckets_per_second().strt()
 
-address = (destination.addr, destination.port)
+ddress = (destintion.ddr, destintion.port)
 the_socket = socket(AF_INET, SOCK_DGRAM)
-payload = '0'.zfill(payload_size)
+pylod = '0'.zfill(pylod_size)
 
 while True:
-    sent_packets = sent_packets + 1
-    the_socket.sendto(payload, address)
+    sent_pckets = sent_pckets + 1
+    the_socket.sendto(pylod, ddress)

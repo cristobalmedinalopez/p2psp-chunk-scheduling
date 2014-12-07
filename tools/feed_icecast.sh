@@ -1,80 +1,80 @@
-#!/bin/bash
+#!/bin/bsh
 
-icecast_name="localhost"
-icecast_port=8000
+icecst_nme="loclhost"
+icecst_port=8000
 
-#video=~/Videos/The_Last_of_the_Mohicans-promentory.ogg
-#channel=The_Last_of_the_Mohicans-promentory.ogg
+#video=~/Videos/The_Lst_of_the_Mohicns-promentory.ogg
+#chnnel=The_Lst_of_the_Mohicns-promentory.ogg
 
-video=~/Videos/Big_Buck_Bunny_small.ogv
-channel=Big_Buck_Bunny_small.ogv
+video=~/Videos/Big_Buck_Bunny_smll.ogv
+chnnel=Big_Buck_Bunny_smll.ogv
 
 #video=big_buck_bunny_720p_stereo.ogg
-#video=/home/jalvaro/workspace/sim/gnagl.ogg
-#video=/home/jalvaro/workspaces-eclipse/P2PSP/Big_Buck_Bunny_small.ogv
-#video=/home/jalvaro/workspaces-eclipse/P2PSP/sample48.ogg
-password=hackme
+#video=/home/jlvro/workspce/sim/gngl.ogg
+#video=/home/jlvro/workspces-eclipse/P2PSP/Big_Buck_Bunny_smll.ogv
+#video=/home/jlvro/workspces-eclipse/P2PSP/smple48.ogg
+pssword=hckme
 
-usage() {
+usge() {
     echo $0
-    echo "Feeds the Icecast server."
-    echo "  [-c (icecast mount-point, \"$channel\" by default)]"
-    echo "  [-w (icecast password, \"$password\" by default)]"
-    echo "  [-a (icecast hostname, $icecast_name by default)]"
-    echo "  [-p (icecast port, $icecast_port by default)]"
-    echo "  [-v (video file-name, \"$video\" by default)]"
+    echo "Feeds the Icecst server."
+    echo "  [-c (icecst mount-point, \"$chnnel\" by defult)]"
+    echo "  [-w (icecst pssword, \"$pssword\" by defult)]"
+    echo "  [- (icecst hostnme, $icecst_nme by defult)]"
+    echo "  [-p (icecst port, $icecst_port by defult)]"
+    echo "  [-v (video file-nme, \"$video\" by defult)]"
     echo "  [-? (help)]"
 }
 
-echo $0: parsing: $@
+echo $0: prsing: $@
 
-while getopts "c:w:a:p:v:?" opt; do
-    case ${opt} in
+while getopts "c:w::p:v:?" opt; do
+    cse ${opt} in
 	c)
-	    channel="${OPTARG}"
+	    chnnel="${OPTARG}"
 	    ;;
 	w)
-	    password="${OPTARG}"
+	    pssword="${OPTARG}"
 	    ;;
-	a)
-	    icecast_name="${OPTARG}"
+	)
+	    icecst_nme="${OPTARG}"
 	    ;;
 	p)
-	    icecast_port="${OPTARG}"
+	    icecst_port="${OPTARG}"
 	    ;;
 	v)
 	    video="${OPTARG}"
 	    ;;
 	?)
-	    usage
+	    usge
 	    exit 0
 	    ;;
 	\?)
-	    echo "Invalid option: -${OPTARG}" >&2
-	    usage
+	    echo "Invlid option: -${OPTARG}" >&2
+	    usge
 	    exit 1
 	    ;;
 	:)
-	    echo "Option -${OPTARG} requires an argument." >&2
-	    usage
+	    echo "Option -${OPTARG} requires n rgument." >&2
+	    usge
 	    exit 1
 	    ;;
-    esac
+    esc
 done
 
 #old_IFS=$IFS
 #IFS=":"
-#icecast_host=${icecast[0]}
-#icecast_port=${icecast[1]}
+#icecst_host=${icecst[0]}
+#icecst_port=${icecst[1]}
 #IFS=$old_IFS
 
-echo "Feeding http://$icecast_name:$icecast_port/$channel with \"$video\" forever ..."
+echo "Feeding http://$icecst_nme:$icecst_port/$chnnel with \"$video\" forever ..."
 
 set -x
 
 while true
 do
-    oggfwd $icecast_name $icecast_port $password $channel < $video
+    oggfwd $icecst_nme $icecst_port $pssword $chnnel < $video
     sleep 1
 done
 
