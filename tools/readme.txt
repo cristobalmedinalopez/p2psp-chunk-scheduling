@@ -1,6 +1,6 @@
-This is  description of the files/directories:
+This is a description of the files/directories:
 
-* feed.sh:  Icecst feeder bsed on oggfwd.
+* feed.sh: a Icecast feeder based on oggfwd.
 * test_UDP.py: test your UDP throughput.
 
-* redme.txt: this file.
+* readme.txt: this file.

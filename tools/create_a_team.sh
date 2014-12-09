@@ -1,4 +1,4 @@
-#!/bin/bsh
+#!/bin/bash
 
 SoR=IMS
 
@@ -8,16 +8,16 @@ SoR=IMS
 #export BUFFER_SIZE=512
 #export CHANNEL="big_buck_bunny_480p_stereo.ogg"
 
-export BUFFER_SIZE=512  # Importnt for the lost of chunks!!!
+export BUFFER_SIZE=512  # Important for the lost of chunks!!!
 #export BUFFER_SIZE=128
 #export BUFFER_SIZE=64
-export CHANNEL="Big_Buck_Bunny_smll.ogv"
+export CHANNEL="Big_Buck_Bunny_small.ogv"
 
 #export BUFFER_SIZE=32
-#export CHANNEL="The_Lst_of_the_Mohicns-promentory.ogg"
+#export CHANNEL="The_Last_of_the_Mohicans-promentory.ogg"
 
 #export BUFFER_SIZE=128
-#export CHANNEL="sintel_triler-144p.ogg"
+#export CHANNEL="sintel_trailer-144p.ogg"
 
 export HEADER_SIZE=10
 export MAX_CHUNK_LOSS=8
@@ -31,43 +31,43 @@ export SOURCE_ADDR="127.0.0.1"
 export SOURCE_PORT=8000
 export SPLITTER_ADDR="127.0.0.1"
 export SPLITTER_PORT=4552
-#export MCAST="--mcst"
+#export MCAST="--mcast"
 export MCAST_ADDR="224.0.0.1"
 export MCAST=""
-#export MCAST_ADDR="0.0.0.0"
+#export MCAST_ADDR="127.0.0.1"
 export TEAM_PORT=5007
 export MAX_LIFE=180
 export BIRTHDAY_PERIOD=1
 #export CHUNK_LOSS_PERIOD=100
 export CHUNK_LOSS_PERIOD=0
 
-usge() {
+usage() {
     echo $0
-    echo " Cretes  locl tem."
-    echo "  [-h heder size in chunks ($HEADER_SIZE)]"
+    echo " Creates a local team."
+    echo "  [-h header size in chunks ($HEADER_SIZE)]"
     echo "  [-b buffer size in chunks ($BUFFER_SIZE)]"
-    echo "  [-c chnnel ($CHANNEL)]"
+    echo "  [-c channel ($CHANNEL)]"
     echo "  [-k chunks size ($CHUNK_SIZE)]"
-    echo "  [-d mximum chunk debt ($MAX_CHUNK_DEBT)]"
-    echo "  [-l mximum chunk loss ($MAX_CHUNK_LOSS)]"
-    echo "  [-i itertions of this script ($ITERATIONS)]"
-    echo "  [-s source IP ddress, ($SOURCE_ADDR)]"
+    echo "  [-d maximum chunk debt ($MAX_CHUNK_DEBT)]"
+    echo "  [-l maximum chunk loss ($MAX_CHUNK_LOSS)]"
+    echo "  [-i iterations of this script ($ITERATIONS)]"
+    echo "  [-s source IP address, ($SOURCE_ADDR)]"
     echo "  [-o source port ($SOURCE_PORT)]"
-    echo "  [- splitter ddr ($SPLITTER_ADDR)]"
+    echo "  [-a splitter addr ($SPLITTER_ADDR)]"
     echo "  [-p splitter port ($SPLITTER_PORT)]"
-    echo "  [-m /* Use IP multicst */ ($MCAST)]"
-    echo "  [-r mcst ddr ($MCAST_ADDR)]"
-    echo "  [-t tem port ($TEAM_PORT)]"
-    echo "  [-f mximum life of  peer ($MAX_LIFE)]"
-    echo "  [-y birthdy period of  peer ($BIRTHDAY_PERIOD)]"
+    echo "  [-m /* Use IP multicast */ ($MCAST)]"
+    echo "  [-r mcast addr ($MCAST_ADDR)]"
+    echo "  [-t team port ($TEAM_PORT)]"
+    echo "  [-f maximum life of a peer ($MAX_LIFE)]"
+    echo "  [-y birthday period of a peer ($BIRTHDAY_PERIOD)]"
     echo "  [-w chunk loss period ($LOSS_PERIOD)]"
     echo "  [-? help]"
 }
 
-echo $0: prsing: $@
+echo $0: parsing: $@
 
-while getopts "h:b:c:k:d:l:i:s:o::p:mr:t:f:y:w:?" opt; do
-    cse ${opt} in
+while getopts "h:b:c:k:d:l:i:s:o:a:p:mr:t:f:y:w:?" opt; do
+    case ${opt} in
 	h)
 	    HEADER_SIZE="${OPTARG}"
 	    echo "HEADER_SIZE="$HEADER_SIZE
@@ -104,7 +104,7 @@ while getopts "h:b:c:k:d:l:i:s:o::p:mr:t:f:y:w:?" opt; do
 	    SOURCE_PORT="${OPTARG}"
 	    echo "LOSSES_THRESHOLD="$SOURCE_PORT
 	    ;;
-	)
+	a)
 	    SPLITTER_ADDR="${OPTARG}"
 	    echo "SPLITTER_ADDR="$SPLITTER_ADDR
 	    ;;
@@ -113,8 +113,8 @@ while getopts "h:b:c:k:d:l:i:s:o::p:mr:t:f:y:w:?" opt; do
 	    echo "SPLITTER_PORT="$SPLITTER_PORT
 	    ;;
 	m)
-	    MCAST="--mcst"
-	    echo "Using IP multicst"
+	    MCAST="--mcast"
+	    echo "Using IP multicast"
 	    ;;
 	r)
 	    MCAST_ADDR="${OPTARG}"
@@ -137,83 +137,83 @@ while getopts "h:b:c:k:d:l:i:s:o::p:mr:t:f:y:w:?" opt; do
 	    echo "CHUNK_LOSS_PERIOD="$CHUNK_LOSS_PERIOD
 	    ;;
 	?)
-	    usge
+	    usage
 	    exit 0
 	    ;;
 	\?)
-	    echo "Invlid option: -${OPTARG}" >&2
-	    usge
+	    echo "Invalid option: -${OPTARG}" >&2
+	    usage
 	    exit 1
 	    ;;
 	:)
-	    echo "Option -${OPTARG} requires n rgument." >&2
-	    usge
+	    echo "Option -${OPTARG} requires an argument." >&2
+	    usage
 	    exit 1
 	    ;;
-    esc
+    esac
 done
 
 set -x
 
-rm -f *.dt
+rm -f *.dat
 
 SPLITTER="../src/splitter.py \
 --buffer_size=$BUFFER_SIZE \
---chnnel=$CHANNEL \
+--channel=$CHANNEL \
 --chunk_size=$CHUNK_SIZE \
---heder_size=$HEADER_SIZE \
---mx_chunk_loss=$MAX_CHUNK_LOSS \
+--header_size=$HEADER_SIZE \
+--max_chunk_loss=$MAX_CHUNK_LOSS \
 $MCAST \
---mcst_ddr=$MCAST_ADDR \
+--mcast_addr=$MCAST_ADDR \
 --port=$SPLITTER_PORT \
---source_ddr=$SOURCE_ADDR \
+--source_addr=$SOURCE_ADDR \
 --source_port=$SOURCE_PORT"
 
 echo $SPLITTER
 
 #xterm -sl 10000 -e $SPLITTER &
-xterm -sl 10000 -e "$SPLITTER | tee splitter.dt" &
+xterm -sl 10000 -e "$SPLITTER | tee splitter.dat" &
 
 sleep 1
 
 PEER="../src/peer.py \
---mx_chunk_debt=$MAX_CHUNK_DEBT \
---plyer_port=9999 \
---splitter_ddr=$SPLITTER_ADDR \
+--max_chunk_debt=$MAX_CHUNK_DEBT \
+--player_port=9999 \
+--splitter_addr=$SPLITTER_ADDR \
 --splitter_port=$SPLITTER_PORT"
 # \
-#--tem_port=$TEAM_PORT"
+#--team_port=$TEAM_PORT"
 
 echo $PEER
 
 #xterm -sl 10000 -e $PEER &
-xterm -T "Monitor" -sl 10000 -e "$PEER | tee monitor.dt" &
+xterm -T "Monitor" -sl 10000 -e "$PEER | tee monitor.dat" &
 
-vlc http://loclhost:9999 > /dev/null 2> /dev/null &
+vlc http://localhost:9999 > /dev/null 2> /dev/null &
 
 sleep 1
 
 PEER="../src/peer.py \
---mx_chunk_debt=$MAX_CHUNK_DEBT \
---plyer_port=9998 \
---splitter_ddr=$SPLITTER_ADDR \
+--max_chunk_debt=$MAX_CHUNK_DEBT \
+--player_port=9998 \
+--splitter_addr=$SPLITTER_ADDR \
 --splitter_port=$SPLITTER_PORT"
 # \
-#--tem_port=$TEAM_PORT"
+#--team_port=$TEAM_PORT"
 
 echo $PEER
 
 #xterm -sl 10000 -e $PEER &
-xterm -sl 10000 -e "$PEER | tee peer.dt" &
+xterm -sl 10000 -e "$PEER | tee peer.dat" &
 
-vlc http://loclhost:9998 > /dev/null 2> /dev/null &
+vlc http://localhost:9998 > /dev/null 2> /dev/null &
 
 x=1
 while [ $x -le $ITERATIONS ]
 do
     sleep $BIRTHDAY_PERIOD
 
-    ./ply.sh - $SPLITTER_ADDR -p $SPLITTER_PORT &
+    ./play.sh -a $SPLITTER_ADDR -p $SPLITTER_PORT &
 
     x=$(( $x + 1 ))
 done
