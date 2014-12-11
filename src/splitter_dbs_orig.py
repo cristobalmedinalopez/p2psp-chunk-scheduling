@@ -49,7 +49,7 @@ class Splitter_DBS(Splitter_IMS):
         self.peer_list = []
 
         # }}}
-        
+
         # {{{ Destination peers of the chunk, indexed by a chunk
         # number. Used to find the peer to which a chunk has been
         # sent.
@@ -98,7 +98,7 @@ class Splitter_DBS(Splitter_IMS):
         self.send_the_list_size(peer_serve_socket)
 
         #peer_serve_socket.sendall(self.message)
-        
+
         if __debug__:
             counter = 0
         for p in self.peer_list:
@@ -134,7 +134,7 @@ class Splitter_DBS(Splitter_IMS):
     def send_configuration(self, sock):
         Splitter_IMS.send_configuration(self, sock)
         self.send_the_peer_endpoint(sock)
-        
+
     def insert_peer(self, peer):
         # {{{
         if peer not in self.peer_list: # Probar a quitar -----------------------------------------------------
@@ -160,7 +160,7 @@ class Splitter_DBS(Splitter_IMS):
         peer = connection[1]
         self.insert_peer(peer)
         return peer
-                
+
         # }}}
 
     def handle_a_peer_arrival(self, connection):
@@ -184,9 +184,9 @@ class Splitter_DBS(Splitter_IMS):
         self.insert_peer(incomming_peer)
         serve_socket.close()
         return incomming_peer
-                
+
         # }}}
-        
+
     def receive_message(self):
         # {{{
 
@@ -203,7 +203,7 @@ class Splitter_DBS(Splitter_IMS):
 
     def get_losser(self, lost_chunk_number):
         # {{{
-        
+
         return self.destination_of_chunk[lost_chunk_number % self.BUFFER_SIZE]
 
         # }}}
@@ -253,7 +253,7 @@ class Splitter_DBS(Splitter_IMS):
         destination = self.get_losser(lost_chunk_number)
 
         if __debug__:
-            
+
             sys.stdout.write(Color.cyan)
             print(sender, "complains about lost chunk", lost_chunk_number, "sent to", destination)
             sys.stdout.write(Color.none)
@@ -301,7 +301,7 @@ class Splitter_DBS(Splitter_IMS):
                 # }}}
 
             else:
-                
+
                 # {{{ The peer wants to leave the team.
 
                 # A !2-length payload means that the peer wants to go
@@ -382,7 +382,9 @@ class Splitter_DBS(Splitter_IMS):
 
         message_format = self.chunk_number_format \
                         + str(self.CHUNK_SIZE) + "s"
-                        
+
+        diagram = open("S.dat", 'w')
+
         #header_load_counter = 0
         while self.alive:
 
@@ -392,12 +394,17 @@ class Splitter_DBS(Splitter_IMS):
                 message = struct.pack(message_format, socket.htons(self.chunk_number), chunk)
                 self.send_chunk(message, peer)
 
+                ts = repr(time.time())
+                s= str(ts) + "\t S --> "+str(peer)+" : "+str(self.chunk_number)+"\n"
+                diagram.write(s)
+
                 self.destination_of_chunk[self.chunk_number % self.BUFFER_SIZE] = peer
                 self.chunk_number = (self.chunk_number + 1) % common.MAX_CHUNK_NUMBER
                 self.compute_next_peer_number(peer)
             except IndexError:
                 _print_("The monitor peer has died!")
 
+        diagram.close()
 
         # }}}
 
