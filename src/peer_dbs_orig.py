@@ -248,7 +248,7 @@ class Peer_DBS(Peer_IMS):
                 # {{{ A new chunk has arrived and the
                 # previous must be forwarded to next peer of the
                 # list of peers.
-                if ( self.receive_and_feed_counter < len(self.peer_list) and ( self.receive_and_feed_previous != '') ):
+                if ( (self.receive_and_feed_counter < len(self.peer_list)) and ( self.receive_and_feed_previous != '') ):
                     # {{{ Send the previous chunk in congestion avoiding mode.
 
                     peer = self.peer_list[self.receive_and_feed_counter]
