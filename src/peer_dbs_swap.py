@@ -50,7 +50,7 @@ class Peer_DBS(Peer_IMS):
         self.chunk_size = peer.chunk_size
         self.message_format = peer.message_format
         #self.extended_message_format = peer.message_format + "4sH"
-
+        self.peer_list_sent = []
         self.pts = 0
         self.ts = 1
 
@@ -159,7 +159,7 @@ class Peer_DBS(Peer_IMS):
             message, sender = self.receive_the_next_message()
 
             if len(message) == struct.calcsize(self.message_format):
-                # {{{ A video chunk has been received
+                # {{{ A videoself.receive_and_feed_counter chunk has been received
 
                 chunk_number, chunk = self.unpack_message(message)
                 self.chunks[chunk_number % self.buffer_size] = chunk
@@ -183,40 +183,42 @@ class Peer_DBS(Peer_IMS):
                             Peer_IMS.DIAGRAM_FILE.write(s)
 
                     # }}}
-                    if ( (len(self.peer_list) - self.receive_and_feed_counter) > 1 and self.receive_and_feed_counter > 0):
+                    self.receive_and_feed_counter = 0
+                    if ((len(self.peer_list)-len(self.peer_list_sent)) > 1):
                         ts = repr(time.time())
-                        s = str(ts) + "\t note left of " + str(self.team_socket.getsockname()) + " : BURST de "+str(len(self.peer_list) - self.receive_and_feed_counter)+"\n"
+                        s = str(ts) + "\t note left of " + str(self.team_socket.getsockname()) + " : BURST!!\n"
                         Peer_IMS.DIAGRAM_FILE.write(s)
 
-                    while( (self.receive_and_feed_counter < len(self.peer_list)) and (self.receive_and_feed_counter > 0
-                    ) ):
+                    while ((len(self.peer_list_sent) < len(self.peer_list)) and (self.receive_and_feed_previous!='')):
+                        print("Index: ", self.receive_and_feed_counter)
                         peer = self.peer_list[self.receive_and_feed_counter]
-                        self.team_socket.sendto(self.receive_and_feed_previous, peer)
-                        self.sendto_counter += 1
+                        if peer not in self.peer_list_sent:
+                            self.team_socket.sendto(self.receive_and_feed_previous, peer)
+                            self.sendto_counter += 1
+                            self.peer_list_sent.append(peer)
+                            # {{{ debug
 
-                        # {{{ debug
+                            if __debug__:
+                                print (self.team_socket.getsockname(), "-",\
+                                    socket.ntohs(struct.unpack(self.message_format, self.receive_and_feed_previous)[0]),\
+                                    Color.green, "->", Color.none, peer)
 
-                        if __debug__:
-                            print (self.team_socket.getsockname(), "-",\
-                                socket.ntohs(struct.unpack(self.message_format, \
-                                                               self.receive_and_feed_previous)[0]),\
-                                Color.green, "->", Color.none, peer)
+                                if Peer_IMS.DIAGRAM != "":
+                                    ts = repr(time.time())
+                                    s = str(ts) + "\t" + str(self.team_socket.getsockname())+ " --> "+str(peer)+ " : "+ str(socket.ntohs(struct.unpack(self.message_format, self.receive_and_feed_previous)[0]))+'\n'
+                                    Peer_IMS.DIAGRAM_FILE.write(s)
+                            # }}}
 
-                            if Peer_IMS.DIAGRAM != "":
-                                ts = repr(time.time())
-                                s = str(ts) + "\t" + str(self.team_socket.getsockname())+ " --> "+str(peer)+ " : "+ str(socket.ntohs(struct.unpack(self.message_format, self.receive_and_feed_previous)[0]))+'\n'
-                                Peer_IMS.DIAGRAM_FILE.write(s)
-                        # }}}
-
-                        self.debt[peer] += 1
-                        if self.debt[peer] > self.MAX_CHUNK_DEBT:
-                            del self.debt[peer]
-                            self.peer_list.remove(peer)
-                            print (Color.red, peer, 'removed by unsupportive', Color.none)
+                            self.debt[peer] += 1
+                            if self.debt[peer] > self.MAX_CHUNK_DEBT:
+                                del self.debt[peer]
+                                self.peer_list.remove(peer)
+                                print (Color.red, peer, 'removed by unsupportive', Color.none)
 
                         self.receive_and_feed_counter += 1
 
                     self.receive_and_feed_counter = 0
+                    self.peer_list_sent = []
                     self.receive_and_feed_previous = message
 
                    # }}}
@@ -249,34 +251,35 @@ class Peer_DBS(Peer_IMS):
                 # {{{ A new chunk has arrived and the
                 # previous must be forwarded to next peer of the
                 # list of peers.
-                if ( (self.receive_and_feed_counter < len(self.peer_list)) and ( self.receive_and_feed_previous != '') ):
+                if ( self.receive_and_feed_previous != '' and sender not in self.peer_list_sent):
                     # {{{ Send the previous chunk in congestion avoiding mode.
+                    if sender != self.splitter:
+                        peer = sender
+                        self.team_socket.sendto(self.receive_and_feed_previous, peer)
+                        self.sendto_counter += 1
+                        self.peer_list_sent.append(peer)
+                        self.debt[peer] += 1
 
-                    peer = self.peer_list[self.receive_and_feed_counter]
-                    self.team_socket.sendto(self.receive_and_feed_previous, peer)
-                    self.sendto_counter += 1
+                        if self.debt[peer] > self.MAX_CHUNK_DEBT:
+                            del self.debt[peer]
+                            self.peer_list.remove(peer)
+                            print (Color.red, peer, 'removed by unsupportive', Color.none)
 
-                    self.debt[peer] += 1
-                    if self.debt[peer] > self.MAX_CHUNK_DEBT:
-                        del self.debt[peer]
-                        self.peer_list.remove(peer)
-                        print (Color.red, peer, 'removed by unsupportive', Color.none)
+                        # {{{ debug
 
-                    # {{{ debug
+                        if __debug__:
+                            print (self.team_socket.getsockname(), "-", \
+                                socket.ntohs(struct.unpack(self.message_format, self.receive_and_feed_previous)[0]),\
+                                Color.green, "->", Color.none, peer)
 
-                    if __debug__:
-                        print (self.team_socket.getsockname(), "-", \
-                            socket.ntohs(struct.unpack(self.message_format, self.receive_and_feed_previous)[0]),\
-                            Color.green, "->", Color.none, peer)
+                            if Peer_IMS.DIAGRAM != "":
+                                ts = repr(time.time())
+                                s = str(ts) + "\t" + str(self.team_socket.getsockname())+ " --> "+str(peer)+ " : "+\
+                                     str(socket.ntohs(struct.unpack(self.message_format, self.receive_and_feed_previous)[0]))+'\n'
+                                Peer_IMS.DIAGRAM_FILE.write(s)
+                        # }}}
 
-                        if Peer_IMS.DIAGRAM != "":
-                            ts = repr(time.time())
-                            s = str(ts) + "\t" + str(self.team_socket.getsockname())+ " --> "+str(peer)+ " : "+\
-                                 str(socket.ntohs(struct.unpack(self.message_format, self.receive_and_feed_previous)[0]))+'\n'
-                            Peer_IMS.DIAGRAM_FILE.write(s)
-                    # }}}
-
-                    self.receive_and_feed_counter += 1
+                        self.receive_and_feed_counter += 1
 
                     # }}}
                 # }}}

@@ -183,14 +183,13 @@ class Peer_DBS(Peer_IMS):
                             Peer_IMS.DIAGRAM_FILE.write(s)
 
                     # }}}
-                    self.receive_and_feed_counter = 0
-                    if ((len(self.peer_list)-len(self.peer_list_sent)) > 1):
+                    if ((len(self.peer_list)-len(self.peer_list_sent)) >1 and len(self.peer_list_sent)>0):
                         ts = repr(time.time())
-                        s = str(ts) + "\t note left of " + str(self.team_socket.getsockname()) + " : BURST!!\n"
+                        s = str(ts) + "\t note left of " + str(self.team_socket.getsockname()) + " : BURST de "+str(len(self.peer_list)-len(self.peer_list_sent))+"\n"
                         Peer_IMS.DIAGRAM_FILE.write(s)
 
-                    while ((len(self.peer_list_sent) < len(self.peer_list)) and (self.receive_and_feed_previous!='')):
-                        print("Index: ", self.receive_and_feed_counter)
+                    self.receive_and_feed_counter = 0
+                    while ((len(self.peer_list_sent) > 0) and (len(self.peer_list_sent) < len(self.peer_list)) and (self.receive_and_feed_previous!='')):
                         peer = self.peer_list[self.receive_and_feed_counter]
                         if peer not in self.peer_list_sent:
                             self.team_socket.sendto(self.receive_and_feed_previous, peer)
@@ -251,9 +250,16 @@ class Peer_DBS(Peer_IMS):
                 # {{{ A new chunk has arrived and the
                 # previous must be forwarded to next peer of the
                 # list of peers.
-                if ( self.receive_and_feed_previous != '' and sender not in self.peer_list_sent):
+                if ( self.receive_and_feed_previous != '' and len(self.peer_list) > 0):
                     # {{{ Send the previous chunk in congestion avoiding mode.
-                    if sender != self.splitter:
+                    if (sender in self.peer_list_sent or sender == self.splitter):
+                        index = 0
+                        sender = self.peer_list[index]
+                        while (sender in self.peer_list_sent and (len(self.peer_list_sent) < len(self.peer_list))):
+                            index += 1
+                            sender = self.peer_list[index]
+
+                    if (sender not in self.peer_list_sent):
                         peer = sender
                         self.team_socket.sendto(self.receive_and_feed_previous, peer)
                         self.sendto_counter += 1
