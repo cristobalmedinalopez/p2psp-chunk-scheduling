@@ -53,7 +53,7 @@ class Peer_DBS(Peer_IMS):
         self.peer_list_sent = []
         self.pts = 0
         self.ts = 1
-
+        self.first_time=True
         _print_("max_chunk_debt =", self.MAX_CHUNK_DEBT)
 
         # }}}
@@ -114,7 +114,7 @@ class Peer_DBS(Peer_IMS):
             self.peer_list.append(peer)
             self.debt[peer] = 0
             tmp -= 1
-
+        self.first_time = True
         _print_("List of peers received")
         sys.stdout.write(Color.none)
 
@@ -184,13 +184,13 @@ class Peer_DBS(Peer_IMS):
 
                     # }}}
                     self.receive_and_feed_counter = 0
-                    if ((len(self.peer_list)-len(self.peer_list_sent)) > 1):
+                    if ((len(self.peer_list)-len(self.peer_list_sent)) > 1 and len(self.peer_list_sent)>0):
                         ts = repr(time.time())
-                        s = str(ts) + "\t note left of " + str(self.team_socket.getsockname()) + " : BURST!!\n"
+                        s = str(ts) + "\t note left of " + str(self.team_socket.getsockname()) + " : BURST "+str(len(self.peer_list)-len(self.peer_list_sent))+"\n"
                         Peer_IMS.DIAGRAM_FILE.write(s)
 
-                    while ((len(self.peer_list_sent) < len(self.peer_list)) and (self.receive_and_feed_previous!='')):
-                        print("Index: ", self.receive_and_feed_counter)
+                    while (((len(self.peer_list_sent) < len(self.peer_list)) and (self.receive_and_feed_previous!='') and len(self.peer_list_sent)>0) or (self.first_time == True and (self.receive_and_feed_previous!=''))):
+                        self.first_time = False
                         peer = self.peer_list[self.receive_and_feed_counter]
                         if peer not in self.peer_list_sent:
                             self.team_socket.sendto(self.receive_and_feed_previous, peer)

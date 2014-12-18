@@ -185,8 +185,12 @@ class Peer_DBS(Peer_IMS):
                             Peer_IMS.DIAGRAM_FILE.write(s)
 
                     # }}}
+                    if (self.receive_and_feed_counter > 0 and (len(self.peer_list) - 1) > self.receive_and_feed_counter):
+                        ts = repr(time.time())
+                        s = str(ts) + "\t note left of " + str(self.team_socket.getsockname()) + " : BURST de "+str(self.receive_and_feed_counter)+"\n"
+                        Peer_IMS.DIAGRAM_FILE.write(s)
 
-                    while (self.receive_and_feed_counter > 0):
+                    while (self.receive_and_feed_counter > 0 and (self.receive_and_feed_previous != '') and ((len(self.peer_list) - 1) > self.receive_and_feed_counter)):
                         peer = self.peer_list[self.receive_and_feed_counter]
                         self.team_socket.sendto(self.receive_and_feed_previous, peer)
                         self.sendto_counter += 1
@@ -200,9 +204,6 @@ class Peer_DBS(Peer_IMS):
                                 Color.green, "->", Color.none, peer)
 
                             if Peer_IMS.DIAGRAM != "":
-                                ts = repr(time.time())
-                                s = str(ts) + "\t note left of " + str(self.team_socket.getsockname()) + " : BURST!!\n"
-                                Peer_IMS.DIAGRAM_FILE.write(s)
                                 ts = repr(time.time())
                                 s = str(ts) + "\t" + str(self.team_socket.getsockname())+ " --> "+str(peer)+ " : "+ str(socket.ntohs(struct.unpack(self.message_format, self.receive_and_feed_previous)[0]))+'\n'
                                 Peer_IMS.DIAGRAM_FILE.write(s)
