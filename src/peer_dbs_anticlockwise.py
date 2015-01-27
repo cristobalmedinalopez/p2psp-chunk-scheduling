@@ -97,8 +97,6 @@ class Peer_DBS(Peer_IMS):
         #number_of_peers = socket.ntohs(struct.unpack("H",self.splitter_socket.recv(struct.calcsize("H")))[0])
         #_print_("The size of the team is", number_of_peers, "(apart from me)")
 
-        self.receive_and_feed_counter = self.number_of_peers - 1
-
         tmp = self.number_of_peers
         while tmp > 0:
             message = self.splitter_socket.recv(struct.calcsize("4sH"))
@@ -185,12 +183,13 @@ class Peer_DBS(Peer_IMS):
                             Peer_IMS.DIAGRAM_FILE.write(s)
 
                     # }}}
-                    if (self.receive_and_feed_counter > 0 and (len(self.peer_list) - 1) > self.receive_and_feed_counter):
+                    if ( (len(self.peer_list) - self.receive_and_feed_counter) > 1 and self.receive_and_feed_counter > 0):
                         ts = repr(time.time())
-                        s = str(ts) + "\t note left of " + str(self.team_socket.getsockname()) + " : BURST de "+str(self.receive_and_feed_counter)+"\n"
+                        s = str(ts) + "\t note left of " + str(self.team_socket.getsockname()) + " : BURST de "+str(len(self.peer_list) - self.receive_and_feed_counter)+"\n"
                         Peer_IMS.DIAGRAM_FILE.write(s)
 
-                    while (self.receive_and_feed_counter > 0 and (self.receive_and_feed_previous != '') and ((len(self.peer_list) - 1) > self.receive_and_feed_counter)):
+                    while( (self.receive_and_feed_counter < len(self.peer_list)) and (self.receive_and_feed_counter > 0
+                    ) ):
                         peer = self.peer_list[self.receive_and_feed_counter]
                         self.team_socket.sendto(self.receive_and_feed_previous, peer)
                         self.sendto_counter += 1
@@ -215,9 +214,9 @@ class Peer_DBS(Peer_IMS):
                             self.peer_list.remove(peer)
                             print (Color.red, peer, 'removed by unsupportive', Color.none)
 
-                        self.receive_and_feed_counter -= 1
+                        self.receive_and_feed_counter += 1
 
-                    self.receive_and_feed_counter = len(self.peer_list) - 1
+                    self.receive_and_feed_counter = 0
                     self.receive_and_feed_previous = message
 
                    # }}}
@@ -238,7 +237,8 @@ class Peer_DBS(Peer_IMS):
 
                     if sender not in self.peer_list:
                         # The peer is new
-                        self.peer_list.append(sender)
+                        #self.peer_list.append(sender)
+                        self.peer_list.insert(len(self.peer_list)-self.number_of_peers, sender)
                         self.debt[sender] = 0
                         print (Color.green, sender, 'added by chunk', \
                             chunk_number, Color.none)
@@ -250,7 +250,7 @@ class Peer_DBS(Peer_IMS):
                 # {{{ A new chunk has arrived and the
                 # previous must be forwarded to next peer of the
                 # list of peers.
-                if ((self.receive_and_feed_counter >= 0) and ( self.receive_and_feed_previous != '')):
+                if ( (self.receive_and_feed_counter < len(self.peer_list)) and ( self.receive_and_feed_previous != '') ):
                     # {{{ Send the previous chunk in congestion avoiding mode.
 
                     peer = self.peer_list[self.receive_and_feed_counter]
@@ -277,7 +277,7 @@ class Peer_DBS(Peer_IMS):
                             Peer_IMS.DIAGRAM_FILE.write(s)
                     # }}}
 
-                    self.receive_and_feed_counter -= 1
+                    self.receive_and_feed_counter += 1
 
                     # }}}
                 # }}}
