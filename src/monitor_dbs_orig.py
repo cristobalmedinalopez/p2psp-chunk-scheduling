@@ -45,6 +45,7 @@ class Monitor_DBS(Peer_DBS):
         self.first_time=True
 	self.pts = 0
         self.ts = 1
+        self.number_of_peers = 0
         # }}}
 
     def print_the_module_name(self):

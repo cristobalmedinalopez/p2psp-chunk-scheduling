@@ -115,9 +115,6 @@ class Peer_DBS(Peer_IMS):
             self.debt[peer] = 0
             tmp -= 1
 
-        #reverse the list
-        self.peer_list.reverse()
-
         _print_("List of peers received")
         sys.stdout.write(Color.none)
 
@@ -241,14 +238,16 @@ class Peer_DBS(Peer_IMS):
                     if sender not in self.peer_list:
                         # The peer is new
                         #self.peer_list.append(sender)
-                        self.peer_list.insert(self.number_of_peers, sender)
-                        self.debt[sender] = 0
-                        print (Color.green, sender, 'added by chunk', \
-                            chunk_number, Color.none)
+                        self.peer_list.insert(len(self.peer_list)-self.number_of_peers, sender)
+
                         if Peer_IMS.DIAGRAM != "":
                                 ts = repr(time.time())
                                 s = str(ts) + "\t Peer List: " + str(self.peer_list)+'\n'
                                 Peer_IMS.DIAGRAM_FILE.write(s)
+
+                        self.debt[sender] = 0
+                        print (Color.green, sender, 'added by chunk', \
+                            chunk_number, Color.none)
                     else:
                         self.debt[sender] -= 1
 
@@ -299,14 +298,16 @@ class Peer_DBS(Peer_IMS):
                     if sender not in self.peer_list:
                         # The peer is new
                         #self.peer_list.append(sender)
-                        self.peer_list.insert(self.number_of_peers, sender)
-                        self.debt[sender] = 0
-                        print (Color.green, sender, 'added by [hello]', Color.none)
+
+                        self.peer_list.insert(len(self.peer_list)-self.number_of_peers, sender)
 
                         if Peer_IMS.DIAGRAM != "":
                                 ts = repr(time.time())
                                 s = str(ts) + "\t Peer List: " + str(self.peer_list)+'\n'
                                 Peer_IMS.DIAGRAM_FILE.write(s)
+
+                        self.debt[sender] = 0
+                        print (Color.green, sender, 'added by [hello]', Color.none)
                 else:
                     if sender in self.peer_list:
                         sys.stdout.write(Color.red)
